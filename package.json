@@ -1,0 +1,22 @@
+{
+  "name": "squash-squash",
+  "version": "1.0.0",
+  "description": "overrides a system or user command for for all child processes",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "command",
+    "override",
+    "alias",
+    "squash"
+  ],
+  "author": "cdaringe",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "lodash.assign": "^3.2.0",
+    "os-tmpdir": "^1.0.1"
+  }
+}

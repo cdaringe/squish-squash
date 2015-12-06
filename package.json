@@ -14,7 +14,9 @@
   ],
   "author": "cdaringe",
   "license": "MIT",
-  "devDependencies": {},
+  "devDependencies": {
+    "tape": "^4.2.2"
+  },
   "dependencies": {
     "lodash.assign": "^3.2.0",
     "os-tmpdir": "^1.0.1"

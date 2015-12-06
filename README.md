@@ -1,7 +1,7 @@
 # squish-squash
 overrides a system or user command for for all child processes
 
-<img width="100px" height="100px" src="img/squash.png"></img>
+<img width="100px" height="100px" src="https://raw.githubusercontent.com/cdaringe/squish-squash/master/img/squash.png"></img>
 
 [ ![Codeship Status for cdaringe/squish-squash](https://codeship.com/projects/c36a2050-7e77-0133-211d-62403764d7f5/status?branch=master)](https://codeship.com/projects/120328)
 

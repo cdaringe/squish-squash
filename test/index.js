@@ -95,7 +95,7 @@ test('squashing node works with #! scripts', function (t) {
   // interpreting via #!/usr/bin/env node
   // assert that the process-hinter indicates we are using electron in #!...
   result = spawnSync('node', [runCpCmd, processHinter])
-  t.equals(result.stdout.toString(), 'ELECTRON_ASAR', 'electron node logs nothing electron asar id')
+  t.equals(result.stdout.toString(), 'ELECTRON_ASAR', 'electron node logs electron asar id')
   delete process.env.ATOM_SHELL_INTERNAL_RUN_AS_NODE
   t.end()
 })

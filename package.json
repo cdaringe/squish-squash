@@ -1,6 +1,6 @@
 {
   "name": "squish-squash",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "overrides a system or user command for for all child processes",
   "main": "src/index.js",
   "scripts": {

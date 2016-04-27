@@ -1,5 +1,5 @@
 # squish-squash
-overrides a system or user command for for all child processes
+override a command for for all child processes
 
 <img width="100px" height="100px" src="https://raw.githubusercontent.com/cdaringe/squish-squash/master/img/squash.png"></img>
 
@@ -10,18 +10,20 @@ overrides a system or user command for for all child processes
 
 ## example
 ```js
-var ss = require('squish-squash');
-// example of squashng system or user cmds with arbitrary command
+const ss = require('squish-squash');
+// example of squashing system or user cmds with arbitrary command
 ss({
     squash: 'node',
-    cmdpath: '/path/to/my/other/node'
+    cmdpath: '/path/to/my/other/node/or/Electron'
 });
 
 // examples of squashing system or user cmds with system commands
+// when any process calls `more`, `less` will actually run
 ss({
     squash: 'more',
     syscmd: 'less'
 });
+// prefer the silver-searcher over grep
 ss({
     squash: 'grep',
     syscmd: 'ag'

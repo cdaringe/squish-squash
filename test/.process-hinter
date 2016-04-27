@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+if (
+  process.NativeModule &&
+  process.NativeModule._cache &&
+  process.NativeModule._cache.ELECTRON_ASAR
+) {
+  process.stdout.write(process.NativeModule._cache.ELECTRON_ASAR.id) // won't log anything on good old fashioned node
+} else {
+  process.stdout.write(process.versions.modules)
+}

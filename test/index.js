@@ -86,9 +86,12 @@ test('squashing node works with #! scripts', function (t) {
 
   // prep for electron node squash!
   process.env.ATOM_SHELL_INTERNAL_RUN_AS_NODE = '1'
+  const epbPath = process.platform.match(/darwin/) ?
+    '../node_modules/electron-prebuilt/dist/Electron.app/Contents/MacOS/Electron' :
+    '../node_modules/electron-prebuilt/dist/electron'
   const overrideCmd = ss({
     squash: 'node',
-    cmdpath: path.resolve(__dirname, '../node_modules/electron-prebuilt/dist/Electron.app/Contents/MacOS/Electron')
+    cmdpath: path.resolve(__dirname, epbPath)
   })
 
   // run electron node against a process which will call another cp mandating

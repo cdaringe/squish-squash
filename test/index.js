@@ -1,104 +1,78 @@
 'use strict'
 
-const test = require('tape')
+require('perish')
+const test = require('ava')
 const ss = require('../') // squish-squash!
 const cp = require('child_process')
-const fs = require('fs')
+const fs = require('fs-extra')
 const path = require('path')
-const dummyCmdPath = './test/testDummyCmd'
+const execa = require('execa')
 
-const spawnSync = (cmd, args) => {
-  const r = cp.spawnSync(cmd, args)
-  if (r.error) throw err
-  if (r.stderr.toString()) {
-    console.error(r.stderr.toString())
-    process.exit(1)
-  }
-  return r
-}
-
-const removeDummyCmd = function () {
-  try { fs.unlinkSync(path.resolve(dummyCmdPath))
-  } catch(err) {
-    // pass
-  }
-}
-removeDummyCmd()
-
-test('sys cmd override', function (t) {
+test('sys cmd override', async t => {
   const dummyCmd = 'dummyCmd'
-
-  t.throws(function () {
-    ss({
-      // squash: dummyCmd,
-      syscmd: 'echo'
-    })
-  }, Error, 'forces squash arg')
-
-  t.throws(function () {
-    ss({
-      squash: dummyCmd,
-    // syscmd: 'echo'
-    })
-  }, Error, 'forces syscmd or cmdpath arg')
-
+  t.throws(() => ss({ syscmd: 'echo' }), Error, 'forces squash arg')
+  t.throws(() => ss({ squash: dummyCmd }), Error, 'forces syscmd or cmdpath arg')
   const squashingCmd = ss({
     squash: dummyCmd,
     syscmd: 'echo'
   })
-  const result = spawnSync(dummyCmd, ['hello'])
-  t.ok(result.stdout.toString().match(/^hello/), 'sys command overriden')
-  t.end()
+  const result = await execa(dummyCmd, ['hello'])
+  t.truthy(result.stdout.toString().match(/^hello/), 'sys command overriden')
 })
 
-test('cmdpath cmd override', function (t) {
-  const userNode = spawnSync('which', ['node']).stdout.toString().match(/.*[a-zA-Z]/)[0]
-  fs.writeFileSync(dummyCmdPath, [
-    '#!' + userNode,
-    'console.log(process.argv[2])'
-  ].join('\n'))
+test('cmdpath cmd override', async t => {
+  function removeDummyCmd () {
+    try {
+      fs.unlinkSync(path.resolve(dummyCmdPath))
+    } catch(err) {
+      /* pass */
+    }
+  }
+  const dummyCmdPath = './test/testDummyCmd'
+  await removeDummyCmd()
+  let { stdout: whichStdout } = await execa('which', ['node'])
+  const userNode = whichStdout.toString().match(/.*[a-zA-Z]/)[0]
+  const dummyScript = `#!${userNode}\nconsole.log(process.argv[2])`
+  await fs.writeFile(dummyCmdPath, dummyScript)
   const dummyCmd2 = 'dummyCmd2'
   const overrideCmd = ss({
     squash: dummyCmd2,
     cmdpath: path.resolve(dummyCmdPath)
   })
-  spawnSync('chmod', ['u+x', dummyCmdPath])
-  const result = spawnSync(dummyCmd2, ['hello2'])
-  t.ok(result.stdout.toString().match(/^hello2/), 'cmdpath command overriden')
-
-  removeDummyCmd()
-  t.end()
+  await execa('chmod', ['u+x', dummyCmdPath])
+  let { stdout: dummyCmd2Stdout } = await execa(dummyCmd2, ['hello2'])
+  t.truthy(dummyCmd2Stdout.toString().match(/^hello2/), 'cmdpath command overriden')
+  await removeDummyCmd()
 })
 
-test('squashing node works with #! scripts', function (t) {
-  const runCpCmd = path.resolve(__dirname, './.run-cp-cmd.js')
-  const processHinter = path.resolve(__dirname, './.process-hinter')
-  spawnSync('chmod', ['u+x', runCpCmd])
-  spawnSync('chmod', ['u+x', processHinter])
-  let result = spawnSync('node', [runCpCmd, processHinter])
+test.only('squashing node works with #! scripts', async t => {
+  const runCpCmd = path.resolve(__dirname, './scaffolding/child-process-runner.js')
+  const processHinter = path.resolve(__dirname, './scaffolding/process-hinter')
+  await execa('chmod', ['u+x', runCpCmd])
+  await execa('chmod', ['u+x', processHinter])
+  let result = await execa('node', [runCpCmd, processHinter])
 
   // assert that the process-hinter echos back our current versions.modules, pre-squash
-  t.equals(
+  t.is(
     result.stdout.toString(),
     process.versions.modules,
     'non-electron node logs its versions'
   )
 
   // prep for electron node squash!
-  process.env.ATOM_SHELL_INTERNAL_RUN_AS_NODE = '1'
-  const epbPath = process.platform.match(/darwin/) ?
-    '../node_modules/electron-prebuilt/dist/Electron.app/Contents/MacOS/Electron' :
-    '../node_modules/electron-prebuilt/dist/electron'
+  process.env.ELECTRON_RUN_AS_NODE = '1'
   const overrideCmd = ss({
     squash: 'node',
-    cmdpath: path.resolve(__dirname, epbPath)
+    cmdpath: path.resolve(__dirname, '../node_modules/.bin/electron')
   })
+  t.is(process.env.PATH.indexOf(overrideCmd.target), 0, 'squashed node is first in PATH')
+  const { stdout: whichNodeStdout } = await execa.shell('which node -a', { env: Object.assign({}, process.env) })
+  t.is(whichNodeStdout.toString().indexOf(overrideCmd.target), 0, 'which reports squashed node')
 
   // run electron node against a process which will call another cp mandating
   // interpreting via #!/usr/bin/env node
   // assert that the process-hinter indicates we are using electron in #!...
-  result = spawnSync('node', [runCpCmd, processHinter])
-  t.equals(result.stdout.toString(), 'ELECTRON_ASAR', 'electron node logs electron asar id')
-  delete process.env.ATOM_SHELL_INTERNAL_RUN_AS_NODE
-  t.end()
+  result = await execa('node', [runCpCmd, processHinter])
+  t.is(result.stdout.toString(), 'ELECTRON_ASAR', 'electron node logs electron asar id')
+  delete process.env.ELECTRON_RUN_AS_NODE
 })

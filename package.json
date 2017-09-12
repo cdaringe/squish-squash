@@ -4,7 +4,7 @@
   "description": "overrides a system or user command for for all child processes",
   "main": "src/index.js",
   "scripts": {
-    "test": "node test/index.js",
+    "test": "ava",
     "preversion": "git checkout master && git pull && npm ls",
     "publish-patch": "npm run preversion && npm version patch && git push origin master --tags && npm publish",
     "publish-minor": "npm run preversion && npm version minor && git push origin master --tags && npm publish",
@@ -18,12 +18,13 @@
   ],
   "author": "cdaringe",
   "license": "MIT",
-  "devDependencies": {
-    "electron-prebuilt": "^0.37.7",
-    "tape": "^4.2.2"
-  },
   "dependencies": {
-    "lodash.assign": "^3.2.0",
     "os-tmpdir": "^1.0.1"
+  },
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "electron": "^1.7.6",
+    "fs-extra": "^4.0.1",
+    "perish": "^1.0.1"
   }
 }

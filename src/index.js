@@ -1,3 +1,6 @@
+'use strict'
+const squash = require('./squash')
+
 /**
  * executes a command string designed to temporarily squash some other command.
  * this is similar to using a bash `alias`, but doesn't modify the user's env,
@@ -22,5 +25,5 @@ module.exports = function (opts) {
       'publish promptly!'
     ].join(' '))
   }
-  return require('./sh-overrider.js')(opts)
+  return squash(opts)
 }

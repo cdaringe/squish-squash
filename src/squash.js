@@ -1,8 +1,10 @@
+'use strict'
+
 var CMD_OVERRIDE_BASE = 'SQUISH_SQUASH'
 var CMD_OVERRIDE_COUNT = 0
 var ss = require('child_process').spawnSync
 var path = require('path')
-var assign = require('lodash.assign')
+var assign = Object.assign
 var ostmpdir = require('os-tmpdir')
 var crypto = require('crypto')
 var fs = require('fs')
@@ -24,9 +26,7 @@ module.exports = function (opts) {
   ++CMD_OVERRIDE_COUNT
   var cmdpath
 
-  if (!opts.squash) {
-    throw new ReferenceError('`squash` property must be provided')
-  }
+  if (!opts.squash) throw new ReferenceError('`squash` property must be provided')
   if (typeof opts.cmdpath === 'string') {
     cmdpath = opts.cmdpath
   } else if (typeof opts.syscmd === 'string') {

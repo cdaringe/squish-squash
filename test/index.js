@@ -61,11 +61,13 @@ test.only('squashing node works with #! scripts', async t => {
 
   // prep for electron node squash!
   process.env.ELECTRON_RUN_AS_NODE = '1'
+  const cmdpath = path.resolve(__dirname, '../node_modules/.bin/electron')
   const overrideCmd = ss({
     squash: 'node',
-    cmdpath: path.resolve(__dirname, '../node_modules/.bin/electron')
+    cmdpath
   })
-  t.is(process.env.PATH.indexOf(overrideCmd.target), 0, 'squashed node is first in PATH')
+  const squashedCmdDir = path.dirname(overrideCmd.target)
+  t.is(process.env.PATH.indexOf(squashedCmdDir), 0, 'squashed node is first in PATH')
   const { stdout: whichNodeStdout } = await execa.shell('which node -a', { env: Object.assign({}, process.env) })
   t.is(whichNodeStdout.toString().indexOf(overrideCmd.target), 0, 'which reports squashed node')
 

@@ -1,4 +1,6 @@
 # squish-squash
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/cdaringe/squish-squash.svg)](https://greenkeeper.io/)
 override a command for for all child processes
 
 <img width="100px" height="100px" src="https://raw.githubusercontent.com/cdaringe/squish-squash/master/img/squash.png"></img>

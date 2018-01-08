@@ -22,9 +22,9 @@
     "os-tmpdir": "^1.0.1"
   },
   "devDependencies": {
-    "ava": "^0.21.0",
+    "ava": "^0.24.0",
     "electron": "^1.7.6",
-    "fs-extra": "^4.0.1",
+    "fs-extra": "^5.0.0",
     "perish": "^1.0.1"
   }
 }
